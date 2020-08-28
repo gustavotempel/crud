@@ -65,9 +65,9 @@ def signin():
 
         result = select_query(f"select email, password from user_table where username='{username}'")
 
-        print(result)
+        print("Resultado de la query: " + str(result))
 
-        if result != None:
+        if result:
             if result[0][1] == password:
                 # Registra la sesión
                 session["username"] = username

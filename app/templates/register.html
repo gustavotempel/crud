@@ -14,20 +14,17 @@
 			</div>
 			<div class="card-body">
 				<form action="/signup" method="POST">
+
+					<!-- username input -->
 					<div class="input-group form-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fas fa-user"></i></span>
 						</div>
-						<input type="text" class="form-control" name="username" placeholder="username">
+						<input onblur="validateuser(this);" type="text" class="form-control" name="username" placeholder="username">
+						<span id="checkuser"></span>
 					</div>
-
-					<div class="input-group form-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text"><i class="fas fa-key"></i></span>
-						</div>
-						<input type="password" class="form-control" name="password" placeholder="password">
-					</div>
-
+					
+					<!-- email input -->
 					<div class="input-group form-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fas fa-at"></i></span>
@@ -35,17 +32,29 @@
 						<input type="email" class="form-control" name="email" placeholder="email">
 					</div>
 
+					<!-- password input -->
+					<div class="input-group form-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fas fa-key"></i></span>
+						</div>	
+						<input type="password" class="form-control" name="password" placeholder="password">
+					</div>	
+
 					<div class="row align-items-center remember">
 						<input type="checkbox">Remember Me
 					</div>
+
+					<!-- submit -->
 					<div class="form-group">
 						<input type="submit" value="Sign Up" class="btn float-right login_btn">
 					</div>
+
 				</form>
 			</div>
 			<div class="card-footer">
 				<div class="d-flex justify-content-center links">
-					Do you have an account?<a href="/login">Sign In</a>
+					<p>Do you have an account? </p>
+					<a href="/login">Sign In</a>
 				</div>
 				<div class="d-flex justify-content-center">
 					<a href="#">Forgot your password?</a>
@@ -54,4 +63,15 @@
 		</div>
 	</div>
 </div>
+
+<script type="text/javascript"> 
+	function validateuser(user) {
+		console.log("verificando usuario")
+		var url = "/validateuser";
+		var params = "username=" + user.value;
+		console.log(params)
+		var ajax = new Ajax.Updater("checkuser", url, {method: "get", parameters: params});
+
+	}
+</script>
 {% endblock %}

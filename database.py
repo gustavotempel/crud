@@ -2,6 +2,7 @@ import os
 import psycopg2
 
 # configuracion de la base de datos Postgresql en heroku
+# postgres://{user}:{password}@{hostname}:{port}/{database-name}
 db_config = "postgres://wdkomuwjqgepfl:35cfd3946b5ca4336c9dda475fd7e0ccd39d2975882b162186f8e9a81f9aef91@ec2-34-237-89-96.compute-1.amazonaws.com:5432/dfrlvq3e2betas"
 
 try:

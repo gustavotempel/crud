@@ -4,9 +4,13 @@ from flask import redirect
 from flask import session
 from flask import render_template
 
-from database import select_query, modify_query
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 
-app = Flask(__name__, template_folder="app/templates")
+from database import select_query
+from database import modify_query
+
+app = Flask(__name__, template_folder="app/templates", static_folder="app/static")
 
 app.secret_key = "qwertyuiop"
 
@@ -25,17 +29,38 @@ def signup():
     if request.method != "POST":
         return index()
     else:
-        username = request.form["username"]
-        email    = request.form["email"]
-        password = request.form["password"]
+        username = request.form.get("username").lower()
+        email    = request.form.get("email").lower()
+        password = generate_password_hash(request.form.get("password"))
 
-        # Guarda el registro en la DB
-        modify_query(f"insert into user_table (username, email, password) values ('{username}', '{email}', '{password}')")
+        # Verifica si ya existe usuario y email
+        db_username = select_query(f"select username from user_table where username='{username}'")
+        db_email = select_query(f"select email from user_table where username='{email}'")
 
-        # Registra la sesión
-        session["username"] = username
+        if db_username or db_email:
+            print("Usuario o email existente")
+            return index()
+        else:
+            # Guarda el registro en la DB
+            modify_query(f"insert into user_table (username, email, password) values ('{username}', '{email}', '{password}')")
+
+            # Registra la sesión
+            session["username"] = username
 
         return index()
+
+@app.route("/validateuser")
+def validateuser():
+    print(request)
+    username = request.args.get("username")
+    print(username)
+    result = select_query(f"select username from user_table where username='{username}'")
+    if result:
+        print("Ya registrado")
+        return "Usuario ya registado"
+    else:
+        print("Disponible")
+        return "Usuario disponible"
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -60,15 +85,15 @@ def signin():
     if request.method != "POST":
         return index()
     else:
-        username = request.form["username"]
-        password = request.form["password"]
+        username = request.form.get("username").lower()
+        password = request.form.get("password")
 
         result = select_query(f"select email, password from user_table where username='{username}'")
 
         print("Resultado de la query: " + str(result))
 
         if result:
-            if result[0][1] == password:
+            if check_password_hash(result[0][1], password):
                 # Registra la sesión
                 session["username"] = username
             else:

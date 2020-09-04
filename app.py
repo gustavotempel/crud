@@ -34,33 +34,34 @@ def signup():
         password = generate_password_hash(request.form.get("password"))
 
         # Verifica si ya existe usuario y email
-        db_username = select_query(f"select username from user_table where username='{username}'")
-        db_email = select_query(f"select email from user_table where username='{email}'")
+        db_username = select_query(f"select username from users where username='{username}'")
+        db_email = select_query(f"select email from users where username='{email}'")
 
         if db_username or db_email:
             print("Usuario o email existente")
             return index()
-        else:
+        elif request.form.get("password") == request.form.get("password2") :
             # Guarda el registro en la DB
-            modify_query(f"insert into user_table (username, email, password) values ('{username}', '{email}', '{password}')")
+            modify_query(f"insert into users (username, email, password) values ('{username}', '{email}', '{password}')")
 
             # Registra la sesión
             session["username"] = username
 
         return index()
 
-@app.route("/validateuser")
-def validateuser():
+@app.route("/validatefield")
+def validatefield():
     print(request)
-    username = request.args.get("username")
-    print(username)
-    result = select_query(f"select username from user_table where username='{username}'")
+    field = request.args.get("field")
+    value = request.args.get("value")
+    print(value)
+    result = select_query(f"select {field} from users where {field}='{value}'")
     if result:
-        print("Ya registrado")
-        return "Usuario ya registado"
+        print("Usuario/email ya registado")
+        return "Used"
     else:
-        print("Disponible")
-        return "Usuario disponible"
+        print("Usuario y email disponibles")
+        return "Available"
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -88,7 +89,7 @@ def signin():
         username = request.form.get("username").lower()
         password = request.form.get("password")
 
-        result = select_query(f"select email, password from user_table where username='{username}'")
+        result = select_query(f"select email, password from users where username='{username}'")
 
         print("Resultado de la query: " + str(result))
 
